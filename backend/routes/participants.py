@@ -93,3 +93,15 @@ def get_participant_qr(
         content=qr_image,
         media_type="image/png"
     )
+
+@router.get("/")
+def get_participants(
+    db: Session = Depends(get_db)
+):
+    participants = (
+        db.query(Participant)
+        .order_by(Participant.created_at.desc())
+        .all()
+    )
+
+    return participants
