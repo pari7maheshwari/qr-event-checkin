@@ -1,134 +1,104 @@
 import { useState } from "react";
+import QRScanner from "./components/QRScanner";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
 
 function App() {
-  const [formData, setFormData] = useState({
-    name: "",
-    roll_number: "",
-    email: "",
-  });
-
-  const [participant, setParticipant] = useState(null);
+  const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
-  function handleChange(event) {
-    const { name, value } = event.target;
+  async function handleScan(detectedCodes) {
+    if (!detectedCodes || detectedCodes.length === 0) {
+      return;
+    }
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  }
+    if (processing) {
+      return;
+    }
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+    const qrToken = detectedCodes[0]?.rawValue;
 
+    if (!qrToken) {
+      return;
+    }
+
+    setProcessing(true);
     setError("");
-    setParticipant(null);
-    setLoading(true);
+    setResult(null);
 
     try {
-      const response = await fetch(`${API_URL}/api/participants/`, {
+      const response = await fetch(`${API_URL}/api/checkin/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          qr_token: qrToken,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || "Registration failed.");
+        throw new Error(data.detail || "Check-in failed.");
       }
 
-      setParticipant(data);
-
-      setFormData({
-        name: "",
-        roll_number: "",
-        email: "",
-      });
+      setResult(data);
     } catch (error) {
       setError(error.message);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setProcessing(false);
+      }, 2000);
     }
+  }
+
+  function handleScannerError(error) {
+    console.error("Scanner error:", error);
   }
 
   return (
     <main className="app">
-      <section className="card">
-        <h1>QR Event Check-In</h1>
+      <section className="card scanner-card">
+        <h1>Event Check-In</h1>
+
         <p className="subtitle">
-          Register for the event and receive your unique QR code.
+          Scan the participant's QR code.
         </p>
 
-        <form onSubmit={handleSubmit}>
-          <label>
-            Name
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter your name"
-              required
-            />
-          </label>
+        <QRScanner
+          onScan={handleScan}
+          onError={handleScannerError}
+        />
 
-          <label>
-            Roll Number
-            <input
-              type="text"
-              name="roll_number"
-              value={formData.roll_number}
-              onChange={handleChange}
-              placeholder="Enter your roll number"
-              required
-            />
-          </label>
+        {processing && (
+          <p className="processing">
+            Processing check-in...
+          </p>
+        )}
 
-          <label>
-            Email
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-            />
-          </label>
-
-          <button type="submit" disabled={loading}>
-            {loading ? "Registering..." : "Register"}
-          </button>
-        </form>
-
-        {error && <p className="error">{error}</p>}
-
-        {participant && (
-          <section className="success">
-            <h2>Registration Successful 🎉</h2>
+        {result && (
+          <div className="success">
+            <h2>✅ Check-In Successful</h2>
 
             <p>
-              <strong>{participant.name}</strong> has been registered.
+              Welcome, <strong>{result.participant.name}</strong>!
             </p>
 
-            <img
-              src={`${API_URL}/api/participants/${participant.id}/qr`}
-              alt="Participant QR code"
-              className="qr-code"
-            />
-
-            <p className="instruction">
-              Show this QR code at the event entrance.
+            <p>
+              Roll Number:{" "}
+              <strong>{result.participant.roll_number}</strong>
             </p>
-          </section>
+          </div>
+        )}
+
+        {error && (
+          <div className="error">
+            <h2>⚠️ Check-In Failed</h2>
+            <p>{error}</p>
+          </div>
         )}
       </section>
     </main>

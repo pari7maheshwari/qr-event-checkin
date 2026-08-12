@@ -87,3 +87,39 @@ button:disabled {
 .instruction {
   color: #666;
 }
+
+.scanner-card {
+  max-width: 600px;
+}
+
+.scanner-container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.scanner-container video {
+  width: 100%;
+  display: block;
+}
+
+.processing {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.success {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  background: #e8f7e8;
+}
+
+.error {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  background: #ffe5e5;
+}
