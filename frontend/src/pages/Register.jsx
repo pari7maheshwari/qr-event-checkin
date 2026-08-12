@@ -44,15 +44,13 @@ function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to register participant."
-        );
+        throw new Error(data.detail || "Failed to register participant.");
       }
 
       setParticipant(data);
 
       const qrResponse = await fetch(
-        `${API_URL}/api/participants/${data.id}/qr`
+        `${API_URL}/api/participants/${data.id}/qr`,
       );
 
       if (!qrResponse.ok) {
@@ -143,19 +141,20 @@ function Register() {
             </p>
 
             <p>
-              Roll Number:{" "}
-              <strong>{participant.roll_number}</strong>
+              Roll Number: <strong>{participant.roll_number}</strong>
             </p>
 
-            <p className="instruction">
-              Give this QR code to the participant.
-            </p>
+            <p className="instruction">Give this QR code to the participant.</p>
 
-            <img
-              src={qrUrl}
-              alt="Participant QR Code"
-              className="qr-code"
-            />
+            <img src={qrUrl} alt="Participant QR Code" className="qr-code" />
+
+            <a
+              href={qrUrl}
+              download={`${participant.roll_number}-qr.png`}
+              className="download-button"
+            >
+              Download QR Code
+            </a>
           </div>
         )}
       </section>
