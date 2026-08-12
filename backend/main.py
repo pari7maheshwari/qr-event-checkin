@@ -5,6 +5,7 @@ from database import Base, engine
 from models.participant import Participant
 from routes.participants import router as participant_router
 from fastapi.middleware.cors import CORSMiddleware
+from routes.checkin import router as checkin_router
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 app.include_router(participant_router)
+app.include_router(checkin_router)
 
 
 @app.get("/")
