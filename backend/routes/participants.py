@@ -8,6 +8,7 @@ from database import SessionLocal
 from models.participant import Participant
 from schemas.participant import ParticipantCreate
 from utils.qr import generate_qr_code
+from dependencies import get_current_admin
 
 router = APIRouter(
     prefix="/api/participants",
@@ -27,7 +28,8 @@ def get_db():
 @router.post("/")
 def create_participant(
     participant_data: ParticipantCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_admin)
 ):
     existing_email = (
         db.query(Participant)
@@ -73,7 +75,8 @@ def create_participant(
 @router.get("/{participant_id}/qr")
 def get_participant_qr(
     participant_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_admin)
 ):
     participant = (
         db.query(Participant)
@@ -96,7 +99,8 @@ def get_participant_qr(
 
 @router.get("/")
 def get_participants(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_admin)
 ):
     participants = (
         db.query(Participant)
