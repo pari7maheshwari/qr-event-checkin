@@ -1,11 +1,13 @@
 import secrets
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
 from models.participant import Participant
 from schemas.participant import ParticipantCreate
+from utils.qr import generate_qr_code
 
 router = APIRouter(
     prefix="/api/participants",
@@ -67,3 +69,27 @@ def create_participant(
     db.refresh(participant)
 
     return participant
+
+@router.get("/{participant_id}/qr")
+def get_participant_qr(
+    participant_id: int,
+    db: Session = Depends(get_db)
+):
+    participant = (
+        db.query(Participant)
+        .filter(Participant.id == participant_id)
+        .first()
+    )
+
+    if not participant:
+        raise HTTPException(
+            status_code=404,
+            detail="Participant not found."
+        )
+
+    qr_image = generate_qr_code(participant.qr_token)
+
+    return Response(
+        content=qr_image,
+        media_type="image/png"
+    )
