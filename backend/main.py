@@ -3,11 +3,13 @@ from sqlalchemy import text
 
 from database import Base, engine
 from models.participant import Participant
+from routes.participants import router as participant_router
 
 app = FastAPI()
 
-
 Base.metadata.create_all(bind=engine)
+
+app.include_router(participant_router)
 
 
 @app.get("/")
