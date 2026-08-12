@@ -285,3 +285,62 @@ button:disabled {
 .download-button:hover {
   background: #1d4ed8;
 }
+
+.home-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.home-options button {
+  padding: 16px;
+  font-size: 16px;
+}
+
+.navbar {
+  width: 100%;
+  padding: 16px 24px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar h2 {
+  margin: 0;
+  color: #111827;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-buttons button {
+  background: #111827;
+  color: white;
+  padding: 10px 16px;
+}
+
+.nav-buttons button:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

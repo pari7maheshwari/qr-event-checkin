@@ -1,28 +1,38 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useState } from "react";
 import Register from "./pages/Register";
-import CheckIn from "./pages/CheckIn";
-import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminCheckIn from "./pages/admin/AdminCheckIn";
 import "./App.css";
 
 function App() {
+  const [page, setPage] = useState("register");
+
   return (
-    <BrowserRouter>
+    <>
       <nav className="navbar">
         <h2>QR Event Check-In</h2>
 
-        <div className="nav-links">
-          <Link to="/">Register</Link>
-          <Link to="/checkin">Check-In</Link>
-          <Link to="/dashboard">Dashboard</Link>
+        <div className="nav-buttons">
+          <button onClick={() => setPage("register")}>
+            Register
+          </button>
+
+          <button onClick={() => setPage("checkin")}>
+            Admin Check-In
+          </button>
+
+          <button onClick={() => setPage("dashboard")}>
+            Admin Dashboard
+          </button>
         </div>
       </nav>
 
-      <Routes>
-        <Route path="/" element={<Register />} />
-        <Route path="/checkin" element={<CheckIn />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter>
+      {page === "register" && <Register />}
+
+      {page === "checkin" && <AdminCheckIn />}
+
+      {page === "dashboard" && <AdminDashboard />}
+    </>
   );
 }
 
