@@ -1,3 +1,4 @@
+from dependencies import get_current_admin
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -21,7 +22,8 @@ def get_db():
 
 @router.get("/stats")
 def get_dashboard_stats(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_admin)
 ):
     total_participants = (
         db.query(Participant)

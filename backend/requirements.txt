@@ -1,7 +1,11 @@
 fastapi
 uvicorn
 sqlalchemy
+psycopg2-binary
 pydantic
 pydantic[email]
+python-dotenv
 qrcode
 pillow
+python-jose[cryptography]
+passlib[bcrypt]
