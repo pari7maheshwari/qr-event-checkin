@@ -24,28 +24,59 @@ function App() {
   return (
     <>
       <nav className="navbar">
-        <h2>QR Event Check-In</h2>
+        {/* BRAND */}
+        <button
+          className="navbar-brand"
+          onClick={() =>
+            setPage(authenticated ? "dashboard" : "register")
+          }
+        >
+          <span className="brand-icon">QR</span>
 
+          <span className="brand-text">
+            <strong>Event</strong>
+            <span>Check-In</span>
+          </span>
+        </button>
+
+        {/* NAVIGATION */}
         <div className="nav-buttons">
-          <button onClick={() => setPage("register")}>
-            Register
-          </button>
-
           {!authenticated ? (
-            <button onClick={() => setPage("login")}>
-              Admin Login
-            </button>
+            <>
+              <button
+                className={page === "register" ? "nav-active" : ""}
+                onClick={() => setPage("register")}
+              >
+                Register
+              </button>
+
+              <button
+                className="nav-primary"
+                onClick={() => setPage("login")}
+              >
+                Admin Login
+              </button>
+            </>
           ) : (
             <>
-              <button onClick={() => setPage("checkin")}>
-                Admin Check-In
+              <button
+                className={page === "checkin" ? "nav-active" : ""}
+                onClick={() => setPage("checkin")}
+              >
+                Check-In
               </button>
 
-              <button onClick={() => setPage("dashboard")}>
-                Admin Dashboard
+              <button
+                className={page === "dashboard" ? "nav-active" : ""}
+                onClick={() => setPage("dashboard")}
+              >
+                Dashboard
               </button>
 
-              <button onClick={handleLogout}>
+              <button
+                className="logout-button"
+                onClick={handleLogout}
+              >
                 Logout
               </button>
             </>
@@ -53,16 +84,20 @@ function App() {
         </div>
       </nav>
 
+      {/* PUBLIC REGISTRATION */}
       {page === "register" && <Register />}
 
+      {/* ADMIN LOGIN */}
       {page === "login" && (
         <Login onLogin={handleLogin} />
       )}
 
+      {/* ADMIN CHECK-IN */}
       {page === "checkin" && authenticated && (
         <AdminCheckIn />
       )}
 
+      {/* ADMIN DASHBOARD */}
       {page === "dashboard" && authenticated && (
         <AdminDashboard />
       )}

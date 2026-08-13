@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getToken } from "../../utils/auth";
-import { apiFetch } from "../../utils/api";
 import "../../App.css";
+
 const API_URL = "http://127.0.0.1:8000";
 
 function AdminDashboard() {
@@ -55,7 +55,13 @@ function AdminDashboard() {
       setStats(statsData);
       setParticipants(participantsData);
     } catch (error) {
-      setError(error.message);
+      console.error("Dashboard error:", error);
+
+      setError(
+        error.message === "Failed to fetch"
+          ? "Unable to connect to the server."
+          : error.message,
+      );
     } finally {
       setLoading(false);
     }
@@ -65,85 +71,192 @@ function AdminDashboard() {
     fetchDashboardData();
   }, []);
 
+  /* =====================================================
+     LOADING
+  ===================================================== */
+
   if (loading) {
     return (
-      <main className="app">
-        <section className="card">
-          <h1>Event Dashboard</h1>
-          <p>Loading dashboard...</p>
+      <main className="admin-page">
+        <section className="admin-dashboard-loading">
+          <div className="loading-spinner"></div>
+
+          <h2>Loading dashboard</h2>
+
+          <p>Fetching the latest event data...</p>
         </section>
       </main>
     );
   }
 
+  /* =====================================================
+     ERROR
+  ===================================================== */
+
   if (error) {
     return (
-      <main className="app">
-        <section className="card">
-          <h1>Event Dashboard</h1>
+      <main className="admin-page">
+        <section className="admin-dashboard-error">
+          <div className="error-icon">!</div>
 
-          <div className="error">
-            <h2>⚠️ Failed to Load Dashboard</h2>
-            <p>{error}</p>
-          </div>
+          <p className="admin-eyebrow">DASHBOARD ERROR</p>
 
-          <button onClick={fetchDashboardData}>Try Again</button>
+          <h1>Unable to load dashboard</h1>
+
+          <p>{error}</p>
+
+          <button
+            className="admin-primary-button"
+            onClick={fetchDashboardData}
+          >
+            Try Again
+          </button>
         </section>
       </main>
     );
   }
 
   return (
-    <main className="app">
-      <section className="card dashboard-card">
-        <h1>Event Dashboard</h1>
+    <main className="admin-page">
+      <section className="admin-dashboard">
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
-        <p className="subtitle">Overview of event attendance.</p>
+        <div className="dashboard-header">
+          <div>
+            <p className="admin-eyebrow">EVENT MANAGEMENT</p>
 
-        {/* Statistics */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <h2>{stats.total_participants}</h2>
-            <p>Total Participants</p>
+            <h1>Event Dashboard</h1>
+
+            <p className="dashboard-description">
+              Monitor registrations and attendance in real time.
+            </p>
           </div>
 
-          <div className="stat-card">
-            <h2>{stats.checked_in}</h2>
-            <p>Checked In</p>
-          </div>
+          <div className="event-status">
+            <span className="status-dot"></span>
 
-          <div className="stat-card">
-            <h2>{stats.not_checked_in}</h2>
-            <p>Remaining</p>
+            <div>
+              <strong>Event Active</strong>
+              <span>Live attendance tracking</span>
+            </div>
           </div>
         </div>
 
-        {/* Attendance */}
-        <div className="attendance">
-          <h2>Attendance: {stats.attendance_percentage}%</h2>
+        {/* =================================================
+            STATISTICS
+        ================================================= */}
 
-          <div className="progress-bar">
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card participants-stat">
+            <div className="stat-icon">👥</div>
+
+            <div className="stat-content">
+              <span>Total Participants</span>
+
+              <strong>{stats.total_participants}</strong>
+
+              <small>Registered for the event</small>
+            </div>
+          </div>
+
+          <div className="admin-stat-card checked-stat">
+            <div className="stat-icon">✓</div>
+
+            <div className="stat-content">
+              <span>Checked In</span>
+
+              <strong>{stats.checked_in}</strong>
+
+              <small>Successfully entered</small>
+            </div>
+          </div>
+
+          <div className="admin-stat-card remaining-stat">
+            <div className="stat-icon">⌛</div>
+
+            <div className="stat-content">
+              <span>Remaining</span>
+
+              <strong>{stats.not_checked_in}</strong>
+
+              <small>Yet to check in</small>
+            </div>
+          </div>
+        </div>
+
+        {/* =================================================
+            ATTENDANCE
+        ================================================= */}
+
+        <section className="attendance-card">
+          <div className="attendance-header">
+            <div>
+              <p className="admin-eyebrow">ATTENDANCE</p>
+
+              <h2>Event attendance</h2>
+            </div>
+
+            <strong className="attendance-percentage">
+              {stats.attendance_percentage}%
+            </strong>
+          </div>
+
+          <div className="attendance-progress">
             <div
-              className="progress"
+              className="attendance-progress-fill"
               style={{
                 width: `${stats.attendance_percentage}%`,
               }}
-            />
+            ></div>
           </div>
-        </div>
 
-        {/* Participants */}
-        <div className="participants-section">
-          <h2>Participants</h2>
+          <div className="attendance-footer">
+            <span>
+              <strong>{stats.checked_in}</strong> people checked in
+            </span>
+
+            <span>
+              <strong>{stats.not_checked_in}</strong> remaining
+            </span>
+          </div>
+        </section>
+
+        {/* =================================================
+            PARTICIPANTS
+        ================================================= */}
+
+        <section className="participants-panel">
+          <div className="participants-header">
+            <div>
+              <p className="admin-eyebrow">REGISTRATION LIST</p>
+
+              <h2>Participants</h2>
+            </div>
+
+            <span className="participant-count">
+              {stats.total_participants} registered
+            </span>
+          </div>
 
           {participants.length === 0 ? (
-            <p>No participants registered yet.</p>
+            <div className="empty-participants">
+              <div className="empty-icon">👥</div>
+
+              <h3>No participants yet</h3>
+
+              <p>
+                Participants will appear here after they register for
+                the event.
+              </p>
+            </div>
           ) : (
-            <div className="table-container">
-              <table className="participants-table">
+            <div className="admin-table-container">
+              <table className="admin-participants-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
+                    <th>Participant</th>
                     <th>Roll Number</th>
                     <th>Email</th>
                     <th>Status</th>
@@ -153,17 +266,41 @@ function AdminDashboard() {
                 <tbody>
                   {participants.map((participant) => (
                     <tr key={participant.id}>
-                      <td>{participant.name}</td>
+                      <td>
+                        <div className="participant-name">
+                          <span className="participant-avatar">
+                            {participant.name
+                              .charAt(0)
+                              .toUpperCase()}
+                          </span>
 
-                      <td>{participant.roll_number}</td>
+                          <strong>{participant.name}</strong>
+                        </div>
+                      </td>
 
-                      <td>{participant.email}</td>
+                      <td>
+                        <span className="roll-number">
+                          {participant.roll_number}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="participant-email">
+                          {participant.email}
+                        </span>
+                      </td>
 
                       <td>
                         {participant.checked_in ? (
-                          <span className="status checked">✓ Checked In</span>
+                          <span className="admin-status checked">
+                            <span>✓</span>
+                            Checked In
+                          </span>
                         ) : (
-                          <span className="status pending">— Pending</span>
+                          <span className="admin-status pending">
+                            <span>—</span>
+                            Pending
+                          </span>
                         )}
                       </td>
                     </tr>
@@ -172,7 +309,7 @@ function AdminDashboard() {
               </table>
             </div>
           )}
-        </div>
+        </section>
       </section>
     </main>
   );
