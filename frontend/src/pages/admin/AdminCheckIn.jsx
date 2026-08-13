@@ -1,9 +1,8 @@
 import { useState } from "react";
 import QRScanner from "../../components/QRScanner";
 import "../../App.css";
-
+import { getToken } from "../../utils/auth";
 const API_URL = "http://127.0.0.1:8000";
-
 function AdminCheckIn() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
@@ -28,11 +27,20 @@ function AdminCheckIn() {
     setError("");
     setResult(null);
 
+    const token = getToken();
+
+    if (!token) {
+      setError("You are not logged in.");
+      setProcessing(false);
+      return;
+    }
+
     try {
-      const response = await fetch(`${API_URL}/api/checkin/`, {
+      const response = await apiFetch("/api/checkin/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           qr_token: qrToken,
@@ -64,20 +72,11 @@ function AdminCheckIn() {
       <section className="card scanner-card">
         <h1>Event Check-In</h1>
 
-        <p className="subtitle">
-          Scan the participant's QR code.
-        </p>
+        <p className="subtitle">Scan the participant's QR code.</p>
 
-        <QRScanner
-          onScan={handleScan}
-          onError={handleScannerError}
-        />
+        <QRScanner onScan={handleScan} onError={handleScannerError} />
 
-        {processing && (
-          <p className="processing">
-            Processing check-in...
-          </p>
-        )}
+        {processing && <p className="processing">Processing check-in...</p>}
 
         {result && (
           <div className="success">
@@ -88,8 +87,7 @@ function AdminCheckIn() {
             </p>
 
             <p>
-              Roll Number:{" "}
-              <strong>{result.participant.roll_number}</strong>
+              Roll Number: <strong>{result.participant.roll_number}</strong>
             </p>
           </div>
         )}

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import "../../App.css";
-
-const API_URL = "http://127.0.0.1:8000";
+import { apiFetch } from "../../utils/api";
 
 function AdminParticipants() {
   const [participants, setParticipants] = useState([]);
@@ -13,16 +12,12 @@ function AdminParticipants() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(
-        `${API_URL}/api/participants/`
-      );
+      const response = await apiFetch("/api/participants/");
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to load participants."
-        );
+        throw new Error(data.detail || "Failed to load participants.");
       }
 
       setParticipants(data);
@@ -42,9 +37,7 @@ function AdminParticipants() {
       <section className="card dashboard-card">
         <h1>Participants</h1>
 
-        <p className="subtitle">
-          View all registered event participants.
-        </p>
+        <p className="subtitle">View all registered event participants.</p>
 
         {loading && <p>Loading participants...</p>}
 
@@ -53,9 +46,7 @@ function AdminParticipants() {
             <h2>Failed to Load Participants</h2>
             <p>{error}</p>
 
-            <button onClick={fetchParticipants}>
-              Try Again
-            </button>
+            <button onClick={fetchParticipants}>Try Again</button>
           </div>
         )}
 
@@ -86,13 +77,9 @@ function AdminParticipants() {
 
                         <td>
                           {participant.checked_in ? (
-                            <span className="status checked">
-                              ✓ Checked In
-                            </span>
+                            <span className="status checked">✓ Checked In</span>
                           ) : (
-                            <span className="status pending">
-                              — Pending
-                            </span>
+                            <span className="status pending">— Pending</span>
                           )}
                         </td>
                       </tr>

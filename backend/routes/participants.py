@@ -28,8 +28,7 @@ def get_db():
 @router.post("/")
 def create_participant(
     participant_data: ParticipantCreate,
-    db: Session = Depends(get_db),
-    current_admin: dict = Depends(get_current_admin)
+    db: Session = Depends(get_db)
 ):
     existing_email = (
         db.query(Participant)
@@ -75,8 +74,7 @@ def create_participant(
 @router.get("/{participant_id}/qr")
 def get_participant_qr(
     participant_id: int,
-    db: Session = Depends(get_db),
-    current_admin: dict = Depends(get_current_admin)
+    db: Session = Depends(get_db)
 ):
     participant = (
         db.query(Participant)

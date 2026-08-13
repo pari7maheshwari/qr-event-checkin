@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { getToken } from "../../utils/auth";
+import { apiFetch } from "../../utils/api";
 import "../../App.css";
-
 const API_URL = "http://127.0.0.1:8000";
 
 function AdminDashboard() {
@@ -14,27 +15,40 @@ function AdminDashboard() {
       setLoading(true);
       setError("");
 
-      const [statsResponse, participantsResponse] =
-        await Promise.all([
-          fetch(`${API_URL}/api/dashboard/stats`),
-          fetch(`${API_URL}/api/participants/`),
-        ]);
+      const token = getToken();
+
+      if (!token) {
+        setError("You are not logged in.");
+        setLoading(false);
+        return;
+      }
+
+      const [statsResponse, participantsResponse] = await Promise.all([
+        fetch(`${API_URL}/api/dashboard/stats`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+
+        fetch(`${API_URL}/api/participants/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+      ]);
 
       const statsData = await statsResponse.json();
-      const participantsData =
-        await participantsResponse.json();
+      const participantsData = await participantsResponse.json();
 
       if (!statsResponse.ok) {
         throw new Error(
-          statsData.detail ||
-            "Failed to load dashboard statistics."
+          statsData.detail || "Failed to load dashboard statistics.",
         );
       }
 
       if (!participantsResponse.ok) {
         throw new Error(
-          participantsData.detail ||
-            "Failed to load participants."
+          participantsData.detail || "Failed to load participants.",
         );
       }
 
@@ -73,9 +87,7 @@ function AdminDashboard() {
             <p>{error}</p>
           </div>
 
-          <button onClick={fetchDashboardData}>
-            Try Again
-          </button>
+          <button onClick={fetchDashboardData}>Try Again</button>
         </section>
       </main>
     );
@@ -86,9 +98,7 @@ function AdminDashboard() {
       <section className="card dashboard-card">
         <h1>Event Dashboard</h1>
 
-        <p className="subtitle">
-          Overview of event attendance.
-        </p>
+        <p className="subtitle">Overview of event attendance.</p>
 
         {/* Statistics */}
         <div className="stats-grid">
@@ -110,9 +120,7 @@ function AdminDashboard() {
 
         {/* Attendance */}
         <div className="attendance">
-          <h2>
-            Attendance: {stats.attendance_percentage}%
-          </h2>
+          <h2>Attendance: {stats.attendance_percentage}%</h2>
 
           <div className="progress-bar">
             <div
@@ -153,13 +161,9 @@ function AdminDashboard() {
 
                       <td>
                         {participant.checked_in ? (
-                          <span className="status checked">
-                            ✓ Checked In
-                          </span>
+                          <span className="status checked">✓ Checked In</span>
                         ) : (
-                          <span className="status pending">
-                            — Pending
-                          </span>
+                          <span className="status pending">— Pending</span>
                         )}
                       </td>
                     </tr>
