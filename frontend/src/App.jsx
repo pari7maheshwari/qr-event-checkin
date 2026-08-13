@@ -7,8 +7,11 @@ import { isAuthenticated, removeToken } from "./utils/auth";
 import "./App.css";
 
 function App() {
-  const [page, setPage] = useState("register");
   const [authenticated, setAuthenticated] = useState(isAuthenticated());
+
+  const [page, setPage] = useState(
+    isAuthenticated() ? "dashboard" : "register",
+  );
 
   function handleLogin() {
     setAuthenticated(true);
@@ -27,9 +30,7 @@ function App() {
         {/* BRAND */}
         <button
           className="navbar-brand"
-          onClick={() =>
-            setPage(authenticated ? "dashboard" : "register")
-          }
+          onClick={() => setPage(authenticated ? "dashboard" : "register")}
         >
           <span className="brand-icon">QR</span>
 
@@ -50,10 +51,7 @@ function App() {
                 Register
               </button>
 
-              <button
-                className="nav-primary"
-                onClick={() => setPage("login")}
-              >
+              <button className="nav-primary" onClick={() => setPage("login")}>
                 Admin Login
               </button>
             </>
@@ -73,10 +71,7 @@ function App() {
                 Dashboard
               </button>
 
-              <button
-                className="logout-button"
-                onClick={handleLogout}
-              >
+              <button className="logout-button" onClick={handleLogout}>
                 Logout
               </button>
             </>
@@ -88,19 +83,13 @@ function App() {
       {page === "register" && <Register />}
 
       {/* ADMIN LOGIN */}
-      {page === "login" && (
-        <Login onLogin={handleLogin} />
-      )}
+      {page === "login" && <Login onLogin={handleLogin} />}
 
       {/* ADMIN CHECK-IN */}
-      {page === "checkin" && authenticated && (
-        <AdminCheckIn />
-      )}
+      {page === "checkin" && authenticated && <AdminCheckIn />}
 
       {/* ADMIN DASHBOARD */}
-      {page === "dashboard" && authenticated && (
-        <AdminDashboard />
-      )}
+      {page === "dashboard" && authenticated && <AdminDashboard />}
     </>
   );
 }
