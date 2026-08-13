@@ -1,40 +1,24 @@
 import { useEffect, useState } from "react";
-import { getToken } from "../../utils/auth";
+import { apiFetch } from "../../utils/api";
 import "../../App.css";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [participants, setParticipants] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
 
   async function fetchDashboardData() {
     try {
       setLoading(true);
       setError("");
 
-      const token = getToken();
-
-      if (!token) {
-        setError("You are not logged in.");
-        setLoading(false);
-        return;
-      }
-
       const [statsResponse, participantsResponse] = await Promise.all([
-        fetch(`${API_URL}/api/dashboard/stats`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
-
-        fetch(`${API_URL}/api/participants/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
+        apiFetch("/api/dashboard/stats"),
+        apiFetch("/api/participants/"),
       ]);
 
       const statsData = await statsResponse.json();
@@ -70,6 +54,22 @@ function AdminDashboard() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  const filteredParticipants = participants.filter((participant) => {
+    const search = searchTerm.toLowerCase().trim();
+
+    const matchesSearch =
+      participant.name.toLowerCase().includes(search) ||
+      participant.roll_number.toLowerCase().includes(search) ||
+      participant.email.toLowerCase().includes(search);
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "checked" && participant.checked_in) ||
+      (statusFilter === "pending" && !participant.checked_in);
+
+    return matchesSearch && matchesStatus;
+  });
 
   /* =====================================================
      LOADING
@@ -240,6 +240,44 @@ function AdminDashboard() {
             </span>
           </div>
 
+          {/* SEARCH + FILTERS */}
+
+          <div className="participant-controls">
+            <input
+              type="text"
+              placeholder="Search by name, roll number, or email..."
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+
+            <div className="participant-filters">
+              <button
+                className={statusFilter === "all" ? "filter-active" : ""}
+                onClick={() => setStatusFilter("all")}
+              >
+                All
+              </button>
+
+              <button
+                className={statusFilter === "checked" ? "filter-active" : ""}
+                onClick={() => setStatusFilter("checked")}
+              >
+                Checked In
+              </button>
+
+              <button
+                className={statusFilter === "pending" ? "filter-active" : ""}
+                onClick={() => setStatusFilter("pending")}
+              >
+                Pending
+              </button>
+            </div>
+          </div>
+
+          {/* =================================================
+              PARTICIPANT CONTENT
+          ================================================= */}
+
           {participants.length === 0 ? (
             <div className="empty-participants">
               <div className="empty-icon">👥</div>
@@ -247,9 +285,17 @@ function AdminDashboard() {
               <h3>No participants yet</h3>
 
               <p>
-                Participants will appear here after they register for
-                the event.
+                Participants will appear here after they register for the
+                event.
               </p>
+            </div>
+          ) : filteredParticipants.length === 0 ? (
+            <div className="empty-participants">
+              <div className="empty-icon">🔎</div>
+
+              <h3>No matching participants</h3>
+
+              <p>Try changing your search or status filter.</p>
             </div>
           ) : (
             <div className="admin-table-container">
@@ -264,14 +310,12 @@ function AdminDashboard() {
                 </thead>
 
                 <tbody>
-                  {participants.map((participant) => (
+                  {filteredParticipants.map((participant) => (
                     <tr key={participant.id}>
                       <td>
                         <div className="participant-name">
                           <span className="participant-avatar">
-                            {participant.name
-                              .charAt(0)
-                              .toUpperCase()}
+                            {participant.name.charAt(0).toUpperCase()}
                           </span>
 
                           <strong>{participant.name}</strong>

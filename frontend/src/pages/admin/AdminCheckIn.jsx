@@ -1,9 +1,7 @@
 import { useState } from "react";
 import QRScanner from "../../components/QRScanner";
 import "../../App.css";
-import { getToken } from "../../utils/auth";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiFetch } from "../../utils/api";
 
 function AdminCheckIn() {
   const [result, setResult] = useState(null);
@@ -29,25 +27,17 @@ function AdminCheckIn() {
     setError("");
     setResult(null);
 
-    const token = getToken();
-
-    if (!token) {
-      setError("You are not logged in.");
-      setProcessing(false);
-      return;
-    }
-
     try {
-      const response = await fetch(`${API_URL}/api/checkin/`, {
+      const response = await apiFetch("/api/checkin/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           qr_token: qrToken,
         }),
       });
+      F;
 
       const data = await response.json();
 
@@ -89,8 +79,8 @@ function AdminCheckIn() {
             <h1>Check-In Station</h1>
 
             <p>
-              Scan a participant's QR pass to verify their registration
-              and record attendance.
+              Scan a participant's QR pass to verify their registration and
+              record attendance.
             </p>
           </div>
 
@@ -111,17 +101,12 @@ function AdminCheckIn() {
             <div>
               <h2>Scan QR Pass</h2>
 
-              <p>
-                Position the participant's QR code inside the scanner.
-              </p>
+              <p>Position the participant's QR code inside the scanner.</p>
             </div>
           </div>
 
           <div className="scanner-frame">
-            <QRScanner
-              onScan={handleScan}
-              onError={handleScannerError}
-            />
+            <QRScanner onScan={handleScan} onError={handleScannerError} />
 
             {!processing && !result && !error && (
               <div className="scanner-overlay">
@@ -138,9 +123,7 @@ function AdminCheckIn() {
           <div className="scanner-hint">
             <span className="hint-icon">⌁</span>
 
-            <span>
-              Make sure the entire QR code is visible and well lit.
-            </span>
+            <span>Make sure the entire QR code is visible and well lit.</span>
           </div>
         </div>
 
@@ -179,18 +162,13 @@ function AdminCheckIn() {
 
               <div className="participant-result-card">
                 <div className="result-avatar">
-                  {result.participant.name
-                    .charAt(0)
-                    .toUpperCase()}
+                  {result.participant.name.charAt(0).toUpperCase()}
                 </div>
 
                 <div>
                   <strong>{result.participant.name}</strong>
 
-                  <span>
-                    Roll Number:{" "}
-                    {result.participant.roll_number}
-                  </span>
+                  <span>Roll Number: {result.participant.roll_number}</span>
                 </div>
               </div>
             </div>
@@ -213,8 +191,8 @@ function AdminCheckIn() {
               <p className="result-message">{error}</p>
 
               <div className="retry-message">
-                Please ask the participant to present a valid QR
-                pass and try again.
+                Please ask the participant to present a valid QR pass and try
+                again.
               </div>
             </div>
           </div>
