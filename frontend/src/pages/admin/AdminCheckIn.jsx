@@ -37,7 +37,6 @@ function AdminCheckIn() {
           qr_token: qrToken,
         }),
       });
-      F;
 
       const data = await response.json();
 
