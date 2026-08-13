@@ -3,7 +3,7 @@ import QRScanner from "../../components/QRScanner";
 import "../../App.css";
 import { getToken } from "../../utils/auth";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function AdminCheckIn() {
   const [result, setResult] = useState(null);

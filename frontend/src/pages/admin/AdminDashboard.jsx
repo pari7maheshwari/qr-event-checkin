@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getToken } from "../../utils/auth";
 import "../../App.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
