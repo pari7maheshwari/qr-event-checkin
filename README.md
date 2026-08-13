@@ -1,130 +1,127 @@
-# EventPass — QR-Based Event Registration & Check-In System
+# EventPass — QR Event Check-In System
 
-EventPass is a full-stack event management system that simplifies participant registration and event attendance using secure QR passes.
-
-Participants register with their basic details and receive a unique QR pass. Administrators can securely log in, view registered participants, and scan QR passes at the entrance to verify and record attendance.
+A full-stack event registration and attendance management system that lets participants register online, receive a unique QR pass, and check in at the event using a QR scanner. Admins can securely log in, monitor registrations, and track attendance in real time.
 
 ## 🚀 Live Demo
 
-**Frontend:**
-https://eventpass-frontend.onrender.com
+**Frontend:** https://eventpass-frontend.onrender.com
 
-**Backend API:**
-https://eventpass-backend-swsz.onrender.com
+> The backend is deployed separately and connected to the frontend through an environment-based API URL.
 
 ## ✨ Features
 
 ### Participant
-
-* Register for an event
-* Prevent duplicate email and roll-number registration
-* Automatically generate a unique QR pass
-* View the QR pass immediately after registration
-* Download the QR code as an image
-* Use the QR pass for event check-in
+- 📝 Online event registration
+- 🎟️ Unique QR pass generated after registration
+- 📥 Downloadable QR pass
+- 📱 QR pass can be presented from a phone or other device
 
 ### Admin
+- 🔐 Secure admin login
+- 📊 Event dashboard with attendance statistics
+- 👥 View registered participants
+- 🔎 Search participants by name, roll number, or email
+- 🟢 Filter participants by checked-in/pending status
+- 📷 QR scanner for event entry
+- ✅ Duplicate/invalid QR verification handled by the backend
+- 📈 Real-time attendance progress
 
-* Secure admin login
-* JWT-based authentication
-* Protected admin dashboard
-* View registered participants
-* View attendance statistics
-* Scan participant QR passes using the device camera
-* Record attendance instantly
-* Prevent duplicate check-ins
-
-### 🔐 Security
-
-* Passwords hashed using Argon2
-* JWT access-token authentication
-* Unique randomly generated QR tokens
-* Protected admin endpoints
-* Duplicate registration validation
-* Duplicate check-in prevention
-* Environment variables used for secrets and database configuration
-
-## 🧑‍💻 User Flow
+## 🧭 Application Flow
 
 ```text
 Participant
     │
     ▼
-Register
+Register for Event
     │
     ▼
-Participant stored in PostgreSQL
+Backend validates & stores registration
     │
     ▼
-Unique QR token generated
+Unique QR pass generated
     │
     ▼
-QR Pass displayed
-    │
-    ▼
-Participant arrives at event
+Participant presents QR at entrance
     │
     ▼
 Admin scans QR
     │
     ▼
-Backend verifies QR token
+Backend verifies participant
     │
     ▼
 Attendance recorded
+    │
+    ▼
+Dashboard updates
 ```
+
+## 🖥️ Screenshots
+
+### 1. Participant Registration
+
+Participants enter their name, roll number, and college email to register for the event.
+
+![Participant Registration](docs/screenshots/registration.png)
+
+### 2. QR Pass Generation
+
+After successful registration, the participant receives a unique QR pass that can be downloaded and presented at the entrance.
+
+![QR Pass](docs/screenshots/qr-pass.png)
+
+### 3. Admin Login
+
+Event staff authenticate through the admin login before accessing event management features.
+
+![Admin Login](docs/screenshots/admin-login.png)
+
+### 4. Event Dashboard
+
+The dashboard provides an overview of total registrations, checked-in participants, remaining participants, and attendance percentage.
+
+![Event Dashboard](docs/screenshots/dashboard.png)
+
+### 5. QR Check-In Station
+
+Admins use the scanner to read a participant's QR pass at the event entrance.
+
+![QR Check-In Scanner](docs/screenshots/checkin-scanner.png)
+
+### 6. Check-In Confirmation
+
+A successful scan verifies the participant and records their attendance.
+
+![Check-In Confirmation](docs/screenshots/checkin-confirmed.png)
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-
-* React
-* Vite
-* JavaScript
-* CSS
-* `@yudiel/react-qr-scanner`
+- React
+- Vite
+- JavaScript (JSX)
+- CSS
+- Fetch API
 
 ### Backend
-
-* Python
-* FastAPI
-* SQLAlchemy
-* PostgreSQL
-* JWT
-* Argon2
-* QR code generation
+- FastAPI
+- Python
+- SQLAlchemy
+- PostgreSQL
+- JWT-based admin authentication
+- Argon2 password hashing
 
 ### Deployment
+- Render
+- GitHub
 
-* Render
-* GitHub
+## 🔐 Security
 
-## 🏗️ Architecture
-
-```text
-┌───────────────────────┐
-│       Participant     │
-│     Mobile / Desktop  │
-└──────────┬────────────┘
-           │
-           ▼
-┌───────────────────────┐
-│   React + Vite        │
-│      Frontend         │
-└──────────┬────────────┘
-           │ REST API
-           ▼
-┌───────────────────────┐
-│      FastAPI          │
-│       Backend         │
-└──────────┬────────────┘
-           │
-           ▼
-┌───────────────────────┐
-│     PostgreSQL        │
-│       Database        │
-└───────────────────────┘
-```
+- Admin routes require authentication.
+- Admin passwords are stored using secure Argon2 hashing rather than plaintext passwords.
+- Authentication tokens are used for protected admin requests.
+- Frontend/backend communication is configured through environment variables.
+- Secrets and environment-specific configuration are kept outside the source code.
 
 ## 📁 Project Structure
 
@@ -132,29 +129,26 @@ Attendance recorded
 qr-event-checkin/
 │
 ├── backend/
-│   ├── models/
-│   ├── routes/
-│   ├── schemas/
-│   ├── utils/
-│   ├── auth.py
-│   ├── database.py
-│   ├── dependencies.py
-│   ├── main.py
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── ...
 │   ├── requirements.txt
-│   └── .env.example
+│   └── ...
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── utils/
 │   │   ├── App.jsx
-│   │   ├── App.css
-│   │   └── main.jsx
+│   │   ├── main.jsx
+│   │   ├── index.css
+│   │   └── ...
 │   ├── package.json
-│   └── .env.example
+│   └── ...
 │
-├── .gitignore
+├── docs/
+│   └── screenshots/
+│
 └── README.md
 ```
 
@@ -163,18 +157,18 @@ qr-event-checkin/
 ### 1. Clone the repository
 
 ```bash
-git clone <your-github-repository-url>
+git clone <your-repository-url>
 cd qr-event-checkin
 ```
 
-### 2. Backend Setup
+### 2. Backend setup
 
 ```bash
 cd backend
 python -m venv .venv
 ```
 
-Activate the virtual environment on Windows:
+Windows PowerShell:
 
 ```powershell
 .venv\Scripts\Activate.ps1
@@ -186,192 +180,66 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Create a `.env` file:
-
-```env
-DATABASE_URL=your_database_url
-SECRET_KEY=your_secret_key
-```
-
-Start the backend:
+Create the backend environment variables required by the project, then start the API:
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
-The API will be available at:
+### 3. Frontend setup
 
-```text
-http://127.0.0.1:8000
-```
-
-### 3. Frontend Setup
-
-Open another terminal:
+From the project root:
 
 ```bash
 cd frontend
 npm install
+npm run dev
 ```
 
-Create `.env`:
+Set the frontend API URL in `.env`:
 
 ```env
 VITE_API_URL=http://127.0.0.1:8000
 ```
 
-Start the development server:
+For production, set `VITE_API_URL` to the deployed backend URL in the frontend hosting environment.
+
+## 🧪 Production Build
+
+To verify the frontend before deployment:
 
 ```bash
-npm run dev
+cd frontend
+npm run build
 ```
 
-The frontend will be available at:
+The production build is generated in `frontend/dist`.
 
-```text
-http://localhost:5173
-```
+## 📊 What This Project Demonstrates
 
-## 🔑 Admin Setup
-
-Create an admin account using the backend admin creation script:
-
-```bash
-cd backend
-python create_admin.py
-```
-
-Enter the requested username, email, and password.
-
-The admin can then log in through the EventPass admin interface.
-
-## 📡 API Overview
-
-### Authentication
-
-```text
-POST /auth/login
-```
-
-Authenticates an administrator and returns a JWT access token.
-
-### Participants
-
-```text
-POST /api/participants/
-GET  /api/participants/
-GET  /api/participants/{participant_id}/qr
-```
-
-### Check-In
-
-```text
-POST /api/checkin/
-```
-
-Verifies the QR token and records attendance.
-
-### Health Check
-
-```text
-GET /health
-```
-
-Used to verify that the backend and database connection are operational.
-
-## 🔄 QR Check-In Logic
-
-Each participant receives a cryptographically random QR token during registration.
-
-The QR code represents the participant's unique token rather than exposing sensitive participant information.
-
-During check-in:
-
-1. Admin scans the QR code.
-2. Frontend extracts the QR token.
-3. Token is sent to the FastAPI backend.
-4. Backend verifies the participant.
-5. Backend checks whether the participant has already checked in.
-6. Attendance is recorded.
-7. Admin receives the verification result.
-
-## 📱 Responsive & Mobile Support
-
-EventPass is designed to work across desktop and mobile devices.
-
-The mobile version supports:
-
-* Participant registration
-* QR pass viewing
-* Admin authentication
-* QR camera scanning
-* Event check-in
-
-The production deployment was tested on a mobile device using the deployed HTTPS application.
-
-## 🌐 Deployment
-
-EventPass is deployed using Render.
-
-```text
-Frontend
-React + Vite
-       │
-       ▼
-Render Static Site
-
-Backend
-FastAPI
-       │
-       ▼
-Render Web Service
-       │
-       ▼
-PostgreSQL
-```
-
-Production environment variables are configured separately from local development.
-
-## 🧠 What This Project Demonstrates
-
-EventPass demonstrates practical full-stack development concepts including:
-
-* REST API design
-* React frontend development
-* FastAPI backend development
-* Relational database integration
-* SQLAlchemy ORM
-* Authentication and authorization
-* Password hashing
-* JWT-based sessions
-* QR generation and scanning
-* API integration
-* CORS configuration
-* Environment variable management
-* Responsive UI development
-* Production deployment
-* Mobile testing
+- Full-stack application development
+- REST API integration
+- Database-backed registration and attendance
+- Authentication and authorization
+- Password hashing and security fundamentals
+- QR code generation and scanning
+- Protected admin workflows
+- Responsive frontend design
+- Deployment of a frontend/backend application
+- Git and GitHub workflow
 
 ## 🔮 Future Improvements
 
-Possible future enhancements include:
-
-* Event creation and management
-* Multiple events
-* Role-based admin permissions
-* CSV attendance export
-* Email confirmation after registration
-* Real-time attendance analytics
-* QR pass expiry
-* Event-specific QR tokens
-* Automated deployment tests
+- Event creation and management for multiple events
+- Export attendance reports as CSV/PDF
+- Email delivery of QR passes
+- Multiple admin roles and permissions
+- Attendance timestamps and entry history
+- Event-specific QR codes
+- Analytics and attendance trends
 
 ## 👩‍💻 Author
 
 **Pari Maheshwari**
 
-Built as a full-stack event registration and attendance management project.
-
----
-
-⭐ If you find this project useful, consider giving the repository a star.
+Built as a full-stack project to demonstrate a practical QR-based event registration and attendance workflow.
