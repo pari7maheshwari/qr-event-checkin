@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -11,6 +12,9 @@ router = APIRouter(
     tags=["Authentication"]
 )
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 def get_db():
     db = SessionLocal()
@@ -20,13 +24,13 @@ def get_db():
     finally:
         db.close()
 
-
 @router.post("/login")
 def login(
-    username: str,
-    password: str,
+    credentials: LoginRequest,
     db: Session = Depends(get_db)
 ):
+    username = credentials.username
+    password = credentials.password
     admin = (
         db.query(Admin)
         .filter(Admin.username == username)

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { saveToken } from "../utils/auth";
+import { apiFetch } from "../utils/api";
 import "../App.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -17,12 +18,16 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${API_URL}/auth/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
-        {
-          method: "POST",
+      const response = await apiFetch("/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
 
       const data = await response.json();
 

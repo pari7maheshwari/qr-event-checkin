@@ -1,3 +1,4 @@
+from dependencies import get_current_admin
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -25,7 +26,8 @@ def get_db():
 @router.post("/")
 def check_in(
     checkin_data: CheckInRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_admin)
 ):
     participant = (
         db.query(Participant)

@@ -1,4 +1,5 @@
 import secrets
+from dependencies import get_current_admin
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
@@ -74,7 +75,8 @@ def create_participant(
 @router.get("/{participant_id}/qr")
 def get_participant_qr(
     participant_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_admin)
 ):
     participant = (
         db.query(Participant)
