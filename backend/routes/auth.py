@@ -69,3 +69,42 @@ def login(
         "access_token": access_token,
         "token_type": "bearer"
     }
+    
+from auth import verify_password, create_access_token, hash_password
+
+class CreateAdminRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+@router.post("/setup-admin")
+def setup_admin(
+    admin_data: CreateAdminRequest,
+    db: Session = Depends(get_db)
+):
+    existing_admin = (
+        db.query(Admin)
+        .filter(Admin.username == admin_data.username)
+        .first()
+    )
+
+    if existing_admin:
+        raise HTTPException(
+            status_code=400,
+            detail="Admin already exists."
+        )
+
+    admin = Admin(
+        username=admin_data.username,
+        email=admin_data.email,
+        password_hash=hash_password(admin_data.password),
+    )
+
+    db.add(admin)
+    db.commit()
+    db.refresh(admin)
+
+    return {
+        "message": "Admin created successfully."
+    }
